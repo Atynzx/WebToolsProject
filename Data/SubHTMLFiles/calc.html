@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMTemperature Mod Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #252526;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 350px;
+            border: 1px solid #3e3e42;
+        }
+        h2 { margin-top: 0; color: #fff; text-align: center; }
+        label { display: block; margin-top: 10px; font-size: 0.9em; color: #aaa; }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+            background-color: #3c3c3c;
+            border: 1px solid #3e3e42;
+            color: #fff;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #0e639c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        button:hover { background-color: #1177bb; }
+        
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #1e1e1e;
+            border-radius: 4px;
+            border-left: 5px solid #555;
+        }
+        .status { font-weight: bold; font-size: 1.2em; }
+        .details { font-size: 0.85em; color: #aaa; margin-top: 5px; }
+        
+        /* Status Colors */
+        .status-icy { color: #3b8eea; border-color: #3b8eea; }
+        .status-cold { color: #8ec3eb; border-color: #8ec3eb; }
+        .status-neutral { color: #69c568; border-color: #69c568; }
+        .status-warm { color: #eebb00; border-color: #eebb00; }
+        .status-hot { color: #ea4e3b; border-color: #ea4e3b; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Mod Temp Calculator</h2>
+    
+    <label>Air Temperature (°F)</label>
+    <input type="number" id="tempF" value="79" placeholder="79">
+
+    <label>Dew Point (°F)</label>
+    <input type="number" id="dewF" value="63" placeholder="63">
+
+    <label>Wind Speed (mph)</label>
+    <input type="number" id="windMph" value="2" placeholder="2">
+
+    <button onclick="calculate()">Calculate Status</button>
+
+    <div id="result" class="result-box" style="display:none;">
+        <div id="statusText" class="status">NEUTRAL</div>
+        <div id="calcDetails" class="details"></div>
+    </div>
+</div>
+
+<script>
+    // --- CONFIGURATION (Match your Java Config) ---
+    const CONFIG = {
+        icy: 0.0,
+        cold: 8.0,
+        warm: 26.0,
+        hot: 32.0
+    };
+
+    function calculate() {
+        // 1. Get Inputs
+        let tempF = parseFloat(document.getElementById('tempF').value);
+        let dewF = parseFloat(document.getElementById('dewF').value);
+        let windMph = parseFloat(document.getElementById('windMph').value);
+
+        if (isNaN(tempF) || isNaN(dewF) || isNaN(windMph)) {
+            alert("Please enter valid numbers");
+            return;
+        }
+
+        // 2. Convert to Metric (Internal Mod Units)
+        let tempC = (tempF - 32) * (5/9);
+        let dewC = (dewF - 32) * (5/9);
+        let windMs = windMph * 0.44704;
+
+        // 3. Run the Mod Logic (Apparent Temp)
+        let apparentC = getApparentTemperature(tempC, dewC, windMs);
+        let apparentF = (apparentC * 9/5) + 32;
+
+        // 4. Determine Status
+        let status = "NEUTRAL";
+        let cssClass = "status-neutral";
+
+        if (apparentC < CONFIG.icy) {
+            status = "ICY";
+            cssClass = "status-icy";
+        } else if (apparentC < CONFIG.cold) {
+            status = "COLD";
+            cssClass = "status-cold";
+        } else if (apparentC > CONFIG.hot) {
+            status = "HOT";
+            cssClass = "status-hot";
+        } else if (apparentC > CONFIG.warm) {
+            status = "WARM";
+            cssClass = "status-warm";
+        }
+
+        // 5. Display
+        let resultBox = document.getElementById('result');
+        let statusText = document.getElementById('statusText');
+        let details = document.getElementById('calcDetails');
+
+        resultBox.style.display = "block";
+        resultBox.className = "result-box " + cssClass; // Apply color border
+        
+        statusText.innerText = `Status: ${status}`;
+        statusText.className = "status " + cssClass; // Apply color text
+
+        let diff = apparentC - tempC;
+        let explanation = "";
+        if (Math.abs(diff) < 0.1) explanation = "Conditions are neutral.";
+        else if (diff > 0) explanation = "Humidity is raising the heat index.";
+        else explanation = "Wind is lowering the perceived temp.";
+
+        details.innerHTML = `
+            <strong>Real Temp:</strong> ${tempF.toFixed(1)}°F (${tempC.toFixed(1)}°C)<br>
+            <strong>Apparent:</strong> ${apparentF.toFixed(1)}°F (${apparentC.toFixed(1)}°C)<br>
+            <br>
+            <em>${explanation}</em>
+        `;
+    }
+
+    // Exact Logic from PMTemperature.java
+    function getApparentTemperature(airTemp, dewPoint, windSpeed) {
+        // Heat Index (Above 20C)
+        if (airTemp > 20) {
+            return airTemp + 0.5555 * (6.11 * Math.exp(5417.753 * (0.0036609921 - (1 / (273.15 + dewPoint)))) - 10);
+        }
+        // Wind Chill (Below 10C)
+        if (airTemp < 10) {
+            return 13.12 + 0.6215 * airTemp - 11.37 * Math.pow(windSpeed, 0.16);
+        }
+        return airTemp;
+    }
+</script>
+
+</body>
+</html>
