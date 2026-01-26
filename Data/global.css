@@ -1,0 +1,100 @@
+/* Data/global.css */
+
+:root {
+    --accent-color: #00bcd4;
+    --accent-hover: #008ba3;
+    --text-main: white;
+    --text-muted: #ccc;
+    --bg-glass: rgba(30, 30, 30, 0.6);
+    --bg-glass-hover: rgba(40, 40, 40, 0.8);
+    --border-glass: rgba(255, 255, 255, 0.1);
+}
+
+/* 1. THE GLASS CARD (For Menu Items & Tool Listings) */
+.glass-card {
+    background: var(--bg-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px); /* For Safari */
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-main);
+    transition: transform 0.3s, border-color 0.3s, background 0.3s, box-shadow 0.3s;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    display: block; /* Ensures it acts like a box */
+}
+
+.glass-card:hover {
+    transform: translateY(-8px);
+    background: var(--bg-glass-hover);
+    border-color: var(--accent-color);
+    box-shadow: 0 12px 40px rgba(0, 188, 212, 0.2);
+    cursor: pointer;
+}
+
+.glass-card h2, .glass-card h3 {
+    margin-top: 0;
+    color: var(--accent-color);
+}
+
+.glass-card p {
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* 2. THE GLASS BUTTON (For "Open Tool", "Calculate", etc.) */
+.glass-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: rgba(0, 188, 212, 0.15); /* Subtle tint */
+    border: 0px solid var(--accent-color);
+    border-radius: 8px;
+    color: var(--accent-color);
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    margin-top: 15px;
+    font-size: 0.9rem;
+}
+
+.glass-btn:hover {
+    background: var(--accent-color);
+    color: #121212; /* Dark text on bright background */
+    box-shadow: 0 0 15px rgba(0, 188, 212, 0.6);
+    transform: scale(1.05);
+}
+
+/* Floating Home Button */
+.home-nav-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    background: rgba(30, 30, 30, 0.274);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #5decff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    z-index: 1000; /* Keeps it above everything else */
+    transition: all 0.3s ease;
+}
+
+.home-nav-btn:hover {
+    background: #00bcd4;
+    color: #121212;
+    box-shadow: 0 0 15px rgba(0, 187, 212, 0.315);
+    transform: scale(1.05);
+}
+
+/* Common Body Setup (Optional: Keeps background consistent) */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+    margin: 0;
+}

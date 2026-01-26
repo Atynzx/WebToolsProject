@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../Data/global.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PM Dev Hub | Home</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            /* PATH FIX: Go up one level (../) to find Data */
+            background: linear-gradient(rgba(7, 61, 20, 0.685), rgba(6, 27, 58, 0.678)), 
+                    url('../Data/minecraftbackground.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Centers content vertically */
+            min-height: 100vh;
+        }
+
+        /* Hero Header */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 { 
+            font-size: 3.5rem; 
+            color: #00bcd4; 
+            margin: 0;
+            text-shadow: 0 0 20px rgba(0, 188, 212, 0.6);
+            letter-spacing: 2px;
+        }
+
+        p.subtitle {
+            color: #ccc;
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        /* Navigation Container */
+        .nav-grid {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1000px;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 50px;
+            font-size: 0.9rem;
+            color: #ebebeb;
+        }
+        .footer a { color: #ebebeb; text-decoration: none; }
+        .footer a:hover { color: #00bcd4; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>cool web tools</h1>
+        <p class="subtitle">tools for anything atp</p>
+    </header>
+
+    <div class="nav-grid">
+        
+        <a href="../Search/search.html" class="glass-card">
+            <h2>Find Tools</h2>
+            <p>search for different utilities and tools</p>
+        </a>
+
+        <a href="https://github.com/Atynzx/WebToolsProject" class="glass-card">
+            <h2>Source Code</h2>
+            <p>View the project on GitHub, report bugs, or contribute to the code.</p>
+        </a>
+
+    </div>
+
+    <div class="footer">
+        totally made by me • <a href="https://github.com/" target="_blank">GitHub</a>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../Data/global.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Hub</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            /* Link to the image from the root */
+            background: linear-gradient(rgba(7, 61, 20, 0.685), rgba(6, 27, 58, 0.678)), 
+                    url('../Data/minecraftbackground.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1 { 
+            font-size: 3.5rem; 
+            color: #00bcd4; 
+            margin: 30px 0;
+            text-shadow: 0 0 20px rgba(0, 188, 212, 0.6);
+            letter-spacing: 1.5px;
+        }
+        
+        /* Search Bar Styling */
+        .search-container {
+            margin-bottom: 30px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        #toolSearch {
+            width: 300px;
+            padding: 12px 20px;
+            background-color: #1e1e1e;
+            border: 2px solid #333;
+            border-radius: 25px;
+            color: white;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #toolSearch:focus { border-color: #00bcd4; }
+
+        .tools-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+        }
+
+        .launch-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #00bcd4;
+            color: #121212;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <a href="../Home/home.html" class="home-nav-btn">← Home</a>
+    
+    <h1>the hub</h1>
+    
+    <div class="search-container">
+        <input type="text" id="toolSearch" placeholder="Search tools..." onkeyup="filterTools()">
+    </div>
+
+    <div class="tools-grid" id="toolsGrid">
+        <div class="glass-card">
+            <h3>Wind Chill/Heat Index Calculator</h3>
+            <p>Calculate apparent temperature based on PMTemperature's logic.</p>
+            <a href="../Tools/Apparent Temperature Calculator/calc.html" class="launch-btn">Open Tool</a>
+        </div>
+
+        <div class="glass-card">
+            <h3>zinky</h3>
+            <p>i hate opal.</p>
+            <a href="#" class="launch-btn" style="background:#444; pointer-events:none;">Coming Soon</a>
+        </div>
+    </div>
+
+    <script>
+        function filterTools() {
+            let input = document.getElementById('toolSearch').value.toLowerCase();
+            let cards = document.getElementsByClassName('tool-card');
+
+            for (let i = 0; i < cards.length; i++) {
+                let title = cards[i].querySelector('.tool-title').innerText.toLowerCase();
+                if (title.includes(input)) {
+                    cards[i].classList.remove('hidden');
+                } else {
+                    cards[i].classList.add('hidden');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
