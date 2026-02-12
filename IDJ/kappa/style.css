@@ -1,0 +1,335 @@
+/* GLOBAL RESETS */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Merriweather', serif; /* The "Government" Font */
+    background-color: #ffffff;
+    color: #212121;
+}
+
+.main-wrapper {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    min-height: 80vh;
+}
+
+/* HEADER */
+header {
+    margin-bottom: 40px;
+}
+
+.title-container h1 {
+    color: #003366; /* DOJ Blue */
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.yellow-bar {
+    width: 60px;
+    height: 4px;
+    background-color: #cfb87c; /* The Gold/Yellow accent */
+}
+
+/* PRIVACY NOTICE BOX */
+.notice-box {
+    background-color: #eef4fb; /* Light Blue Background */
+    border-left: 5px solid #003366;
+    padding: 20px;
+    margin-bottom: 40px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.notice-box h3 {
+    color: #003366;
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.yellow-mini-bar {
+    width: 30px;
+    height: 3px;
+    background-color: #cfb87c;
+    margin-bottom: 15px;
+}
+
+.last-updated {
+    margin-top: 15px;
+    font-style: italic;
+    color: #666;
+    font-size: 12px;
+}
+
+/* SEARCH SECTION */
+.search-section {
+    background-color: #f9f9f9;
+    padding: 30px;
+    margin-bottom: 40px;
+    border-top: 1px solid #ddd;
+}
+
+.search-section h2 {
+    color: #003366;
+    margin-top: 0;
+}
+
+.search-bar-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#search-input {
+    flex-grow: 1;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    font-family: 'Roboto', sans-serif;
+}
+
+#search-btn {
+    background-color: #004b8d; /* Search Button Blue */
+    color: white;
+    border: none;
+    padding: 0 25px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#search-btn:hover {
+    background-color: #003366;
+}
+
+.search-note {
+    font-size: 11px;
+    color: #888;
+    margin-top: 10px;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* FILE CARDS (The Auto-Generated List) */
+.file-card {
+    border: 1px solid #e0e0e0;
+    padding: 25px;
+    margin-bottom: 20px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.file-card:hover {
+    border-color: #003366;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.file-info h4 {
+    margin: 0 0 5px 0;
+    color: #004b8d;
+    font-size: 18px;
+}
+
+.file-info p {
+    margin: 0;
+    font-size: 12px;
+    color: #555;
+    font-family: 'Roboto', sans-serif;
+}
+
+.download-btn {
+    background-color: #003366;
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: bold;
+    font-family: 'Roboto', sans-serif;
+}
+
+.download-btn:hover {
+    background-color: #002244;
+}
+
+/* FOOTER */
+footer {
+    background-color: #1a1a1a;
+    color: white;
+    padding: 40px 0;
+    margin-top: 60px;
+}
+
+.footer-content {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.footer-seal img {
+    height: 80px;
+    margin-right: 40px;
+}
+
+.footer-links {
+    display: flex;
+    gap: 50px;
+}
+
+.footer-links a {
+    display: block;
+    color: #ccc;
+    text-decoration: none;
+    font-family: 'Roboto', sans-serif;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.footer-links h4 {
+    border-bottom: 1px solid #555;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.bottom-bar {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 10px;
+    color: #555;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* DOJ TOP BAR STYLES */
+.gov-banner {
+    background-color: #f0f0f0;
+    font-size: 11px;
+    padding: 4px 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.gov-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.gov-content img {
+    height: 10px;
+}
+
+.gov-content a {
+    color: #003366;
+    text-decoration: none;
+}
+
+.doj-header-nav {
+    background-color: #1a1a1a; /* Deep DOJ Blue */
+    color: #ffffff;
+    padding: 20px 0;
+}
+
+.doj-nav-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.doj-branding {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.doj-branding img {
+    height: 110px; /* Adjust based on your logo shape */
+}
+
+.doj-branding-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.doj-branding-text .prefix {
+    font-size: 16px;
+    font-family: 'Merriweather', serif;
+    font-weight: 300;
+}
+
+.doj-branding-text .agency {
+    font-size: 47px;
+    font-family: 'Merriweather', serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.doj-nav-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.utility-links {
+    font-size: 12px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.utility-links a {
+    color: white;
+    text-decoration: none;
+}
+
+.mini-search {
+    display: flex;
+}
+
+.mini-search input {
+    padding: 5px 10px;
+    border: none;
+    font-size: 14px;
+}
+
+.mini-search button {
+    background-color: #9c9c9c; /* Gold Button */
+    border: none;
+    padding: 5px 12px;
+    cursor: pointer;
+}
+
+.doj-gold-line {
+    height: 4px;
+    background-color: #9c9c9c;
+}
+
+.file-description {
+    margin-top: 8px !important;
+    font-size: 13px !important;
+    color: #444 !important;
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.4;
+    max-width: 600px;
+}
+
+.file-meta {
+    color: #888 !important;
+    margin-bottom: 2px !important;
+}
+
+/* Optional: Highlight style if you want search hits to pop */
+.search-match {
+    background-color: #fff2ac;
+}

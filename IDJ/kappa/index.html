@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDJ Transparency Archive | Kappa-16</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="gov-banner">
+        <div class="gov-content">
+            <img src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg" alt="US Flag">
+            <span>A fan-made opensource website made for <a href="https://discord.gg/SCP-Site-81">Site-81 Roleplay</a></span>
+        </div>
+    </div>
+
+    <nav class="doj-header-nav">
+        <div class="doj-nav-container">
+            <div class="doj-branding">
+                <img src="logo.png" alt="IDJ Logo">
+                <div class="doj-branding-text">
+                    <span class="prefix">Independent Department of</span>
+                    <span class="agency">JUSTICE</span>
+                </div>
+            </div>
+        
+            <div class="doj-nav-right">
+                <div class="utility-links">
+                    <a href="#">Our Offices</a> | <a href="#">Find Help</a> | <a href="#">Contact Us</a>
+                </div>
+                <div class="mini-search">
+                    <input type="text" placeholder="Search">
+                    <button type="submit">🔍</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="doj-gold-line"></div>
+
+    <div class="main-wrapper">
+        <header>
+            <div class="title-container">
+                <h1>IDJ Transparency Library</h1>
+                <div class="yellow-bar"></div>
+            </div>
+        </header>
+
+        <div class="notice-box">
+            <h3>SENSITIVE CONTENT WARNING</h3>
+            <div class="yellow-mini-bar"></div>
+            <p>
+                In view of the Independent Department of Justice deadline, all reasonable efforts have been made to review and redact 
+                sensitive information in the files. However, due to the volume of information involved, this website 
+                may contain descriptions of <strong>unauthorized lethal force</strong>, <strong>amnestic abuse</strong>, <strong>coercion</strong>, <strong>etc</strong>.
+            </p>
+            <p><em>Please be advised that certain portions of this library may not be appropriate for all individuals.</em></p>
+            <p class="last-updated">Last Updated: <span id="current-date"></span></p>
+        </div>
+
+        <div class="intro-text">
+            <p>
+                This site houses materials responsive under the <strong>Site-81 Transparency Act</strong> regarding Stationary Task Force Kappa-16. 
+                This site will be automatically updated as additional documents are identified for release.
+            </p>
+        </div>
+
+        <div class="search-section">
+            <h2>Search Full IDJ Library</h2>
+            <div class="yellow-mini-bar"></div>
+            
+            <div class="search-bar-wrapper">
+                <input type="text" id="search-input" placeholder="Enter keyword or file ID...">
+                <button id="search-btn">Search</button>
+                <button id="load-all-btn" style="background-color: #666; color: white; border: none; padding: 0 15px; cursor: pointer; font-size: 13px;">View All Records</button>
+            </div>
+            <p class="search-note">
+                <strong>Note on Functionality:</strong> Due to technical limitations and data redaction within the files, 
+                text inside PDFs may not be fully searchable. Search results rely on file metadata.
+            </p>
+        </div>
+
+        <div id="file-container">
+            <div class="loading-spinner">Loading Archive Data...</div>
+        </div>
+
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-seal">
+                <img src="logo.png" alt="Official Seal">
+            </div>
+            <div class="footer-links">
+                <div class="col">
+                    <h4>IDJ Resources</h4>
+                    <a href="#">Ethics Committee</a>
+                    <a href="#">Internal Tribunal</a>
+                    <a href="#">Whistleblower Act</a>
+                </div>
+                <div class="col">
+                    <h4>Contact</h4>
+                    <a href="#">Report a Violation</a>
+                    <a href="#">Secure Drop</a>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-bar">
+            IDJ ARCHIVE // <a href="https://github.com/Atynzx/WebToolsProject">Github</a>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
