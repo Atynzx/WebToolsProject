@@ -333,3 +333,72 @@ footer {
 .search-match {
     background-color: #fff2ac;
 }
+
+/* MODAL STYLES */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px); /* The blur effect */
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: all 0.3s ease;
+}
+
+.modal-content {
+    background: white;
+    padding: 40px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    border-top: 5px solid #003366;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #003366;
+    letter-spacing: 2px;
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.modal-btn {
+    padding: 12px;
+    text-decoration: none;
+    font-family: 'Roboto', sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border: 1px solid #ccc;
+    color: #333;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.modal-btn:hover {
+    background: #f0f0f0;
+}
+
+.modal-btn.highlight {
+    background: #003366;
+    color: white;
+    border: none;
+}
+
+.modal-btn.cancel {
+    background: none;
+    border: none;
+    color: #888;
+    text-decoration: underline;
+}

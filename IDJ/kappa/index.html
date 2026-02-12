@@ -73,6 +73,7 @@
                 <input type="text" id="search-input" placeholder="Enter keyword or file ID...">
                 <button id="search-btn">Search</button>
                 <button id="load-all-btn" style="background-color: #666; color: white; border: none; padding: 0 15px; cursor: pointer; font-size: 13px;">View All Records</button>
+                <button id="clear-btn" style="background-color: #900; color: white; border: none; padding: 0 15px; cursor: pointer; font-size: 13px;">Clear</button>
             </div>
             <p id="result-count" style="font-family: 'Roboto', sans-serif; font-size: 12px; margin-top: 10px; color: #003366; font-weight: 500;"></p>
             <p class="search-note">
@@ -112,5 +113,20 @@
     </footer>
 
     <script src="script.js"></script>
+
+    <div id="file-modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modal-title">FILE ACCESS</h3>
+            <div class="yellow-mini-bar" style="margin: 10px auto;"></div>
+            <p id="modal-desc"></p>
+        
+            <div class="modal-actions">
+                <a id="link-view" target="_blank" class="modal-btn">View on GitHub</a>
+                <a id="link-gdoc" target="_blank" class="modal-btn" style="display:none;">Google Docs Version</a>
+                <a id="link-download" class="modal-btn highlight">Download Raw File</a>
+                <button onclick="closeModal()" class="modal-btn cancel">Close</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
