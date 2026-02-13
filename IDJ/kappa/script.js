@@ -4,11 +4,14 @@ document.addEventListener("DOMContentLoaded", function() {
     const REPO_NAME = "WebToolsProject";
     const FOLDER_PATH = "IDJ/kappa/files";
     
-    // Updated with the typo fix (09942) and Object-based structure
     const fileDescriptions = {
         "SCPIDJK16-00962": { 
             desc: "Interview regarding unauthorized use of lethal force on a maintenance crew by one of Kappa-16 Operatives. Subject: i_likebeans551.",
             gdoc: "https://docs.google.com/document/d/1nwf2gJEPSn-d5B4dyHt2KvHvG5yHVdKLLiBCff0BM5w/edit?usp=sharing"
+        },
+        "SCPIDJK16-09958": { 
+            desc: "Interview regarding Kappa-18 and their abuse of powers. Subject: joopie_joopiter.",
+            gdoc: "https://docs.google.com/document/d/1TKxakzhgmOWsyfRj0IljNe_g73edSpPbY8jZdRuuPUg/edit?usp=sharing"
         },
         "SCPIDJK16-09942": { 
             desc: "Log of Site-81's incident involving Kappa-16 covering up a homicide scene.",
@@ -21,6 +24,10 @@ document.addEventListener("DOMContentLoaded", function() {
         "SCPIDJK16-00951": { 
             desc: "Incident regarding unauthorized Class-C amnestic overdose of a Senior Researcher in Sector-4 involving Kappa-16.",
             gdoc: "https://docs.google.com/document/d/1vMEt7aoQGGdLWIOE-sAQ0ZIuDXTskQvWuHYVou3ttE4/edit?usp=sharing"
+        },
+        "SCPIDJK16-01024": { 
+            desc: "Bribery operations involving a high-level financial stakeholder/investor and a Kappa-16 operative.",
+            gdoc: "https://docs.google.com/document/d/1AagEU9DsNICC3HWSD8UFtiknfDNvO5mdbexgsQekmnY/edit?usp=sharing"
         },
         "SCPIDJK16-00957": { 
             desc: "Intelligence Intercept / Coercion and Extortion Log of one of Kappa-16 agents sending threats to the victim.",
