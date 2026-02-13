@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
             gdoc: "https://docs.google.com/document/d/1-Ba-MzPnCuA_brOiQebd6wDLheV42qkQ62eVQodIjtA/edit?usp=sharing"
         },
         "SCPIDJK16-12466": { 
-            desc: "Log of Site-81's incident involving Kappa-16 Operative Exombit in team killing of a maintenance crew derrickc7.",
+            desc: "Log of Site-81's incident involving Kappa-16 Operative Exombit in heavily injuring a maintenance crew member derrickc7.",
             gdoc: "https://docs.google.com/document/d/129c1A0fuPQ_7_37xCXYdSrhsjMqbq1MumpeskGEBaik/edit?usp=sharing"
         },
         "SCPIDJK16-00951": { 
@@ -28,6 +28,10 @@ document.addEventListener("DOMContentLoaded", function() {
         "SCPIDJK16-01024": { 
             desc: "Bribery operations involving a high-level financial stakeholder/investor and a Kappa-16 operative.",
             gdoc: "https://docs.google.com/document/d/1AagEU9DsNICC3HWSD8UFtiknfDNvO5mdbexgsQekmnY/edit?usp=sharing"
+        },
+        "MDD-9003": { 
+            desc: "derrickc4's official medical report regarding the IDJK16-12466 incident.",
+            gdoc: "https://docs.google.com/document/d/1eSMPk9e2nPqw0Q_t8LxRsm46UReQLIJFm8cK-YENnPg/edit?usp=sharing"
         },
         "SCPIDJK16-00957": { 
             desc: "Intelligence Intercept / Coercion and Extortion Log of one of Kappa-16 agents sending threats to the victim.",
