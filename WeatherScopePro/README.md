@@ -19,6 +19,15 @@ Modernized weather workstation web app with a cleaner operational layout.
 - Built-in drawing tools
 - Model point viewer + quick sounding card (GFS/HRRR direct, RAP/NAM/RRFS mapped fallback)
 - Light/dark theme toggle
+A professional-style weather web app with:
+
+- Global basemaps and radar overlays (RainViewer + NOAA products)
+- Live warning polygons with category controls (regular, PDS/considerable, emergency/destructive)
+- Weather watch and mesoscale discussion overlays
+- User-customizable warning/watch colors and visibility
+- Map drawing tools (markers, polygons, lines, etc.)
+- Click-to-load model guidance and quick sounding profile
+- Light/dark mode and responsive panel layout
 
 ## Run locally
 
