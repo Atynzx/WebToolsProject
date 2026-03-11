@@ -1,32 +1,33 @@
 # WeatherScope Pro
 
-Refactored weather workstation with a map-first radar UI and structured settings system.
+Modernized weather workstation web app with a cleaner operational layout.
 
-## What was fixed and improved
+## Included capabilities
 
-- Repaired broken behavior with a full code pass and rebuilt app flow.
-- Moved radar controls from sidebar into a **bottom in-map overlay**.
-- Added radar overlay controls:
-  - Play/Pause loop
-  - Frame step back/forward
-  - Snapshot button
-  - Timeline scrubber + timestamp
-  - Radar product selector
-  - Dynamic site metadata panel
-- Added **NEXRAD Level III (site-based)** and **Level II mosaic** viewing mode.
-- Expanded NEXRAD product list including reflectivity, velocity, dual-pol, and derived products.
-- Added many additional NEXRAD site markers across the U.S.
-- Added **Settings modal** with categories:
-  - Radar Rendering
-  - Warnings
-  - Watches
-  - Advisories
-  - Appearance
-- Added per-alert-subtype controls (visibility + color + line weight), including:
-  - Tornado Warning (Radar, Observed, PDS, Emergency)
-  - Severe / Flood warnings
-  - Watches
-  - Advisories
+- Modern tabbed UI for **Radar**, **Layers**, **Models**, and **Map settings**
+- Smoother map movement/zoom animations tuned for operational navigation
+- NEXRAD network markers (clickable radar sites)
+- Site-specific NEXRAD product loading (NOAA/IEM tile source), including:
+  - Base Reflectivity
+  - Super-Res Reflectivity
+  - Base Velocity
+  - Storm Relative Motion
+  - Enhanced Echo Tops
+  - Correlation Coefficient
+- Hazard overlays for active warnings, SPC watches, and mesoscale discussions
+- Warning severity category filtering and fully customizable colors
+- Built-in drawing tools
+- Model point viewer + quick sounding card (GFS/HRRR direct, RAP/NAM/RRFS mapped fallback)
+- Light/dark theme toggle
+A professional-style weather web app with:
+
+- Global basemaps and radar overlays (RainViewer + NOAA products)
+- Live warning polygons with category controls (regular, PDS/considerable, emergency/destructive)
+- Weather watch and mesoscale discussion overlays
+- User-customizable warning/watch colors and visibility
+- Map drawing tools (markers, polygons, lines, etc.)
+- Click-to-load model guidance and quick sounding profile
+- Light/dark mode and responsive panel layout
 
 ## Run locally
 
