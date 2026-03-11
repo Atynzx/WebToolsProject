@@ -1,576 +1,429 @@
-const map = L.map('map', {
-  zoomControl: true,
-  worldCopyJump: true,
-  inertia: true,
-  inertiaDeceleration: 2200,
-  easeLinearity: 0.15,
-  zoomAnimation: true,
-  fadeAnimation: true,
-  markerZoomAnimation: true,
-  preferCanvas: true
-}).setView([36, -97], 4);
-
-const basemaps = {
-  "Carto Dark": L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap &copy; CARTO' }),
-  "Carto Light": L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap &copy; CARTO' }),
-  "OpenStreetMap": L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }),
-  "Satellite": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri' })
-};
-
-let activeBasemap = basemaps['Carto Dark'].addTo(map);
-
-const radarProducts = {
-  "Base Reflectivity (N0Q)": "N0Q",
-  "Super-Res Reflectivity (N0B)": "N0B",
-  "Base Velocity (N0U)": "N0U",
-  "Storm Relative Motion (N0S)": "N0S",
-  "Enhanced Echo Tops (EET)": "EET",
-  "Correlation Coefficient (N0C)": "N0C"
-};
-
-const nexradSites = [
-  { id: 'KTLX', name: 'Oklahoma City, OK', lat: 35.333, lon: -97.277 },
-  { id: 'KFDR', name: 'Frederick, OK', lat: 34.362, lon: -98.976 },
-  { id: 'KVNX', name: 'Vance AFB, OK', lat: 36.741, lon: -98.127 },
-  { id: 'KDGX', name: 'Brandon, MS', lat: 32.280, lon: -89.985 },
-  { id: 'KBMX', name: 'Birmingham, AL', lat: 33.171, lon: -86.769 },
-  { id: 'KFFC', name: 'Peachtree City, GA', lat: 33.363, lon: -84.566 },
-  { id: 'KTLH', name: 'Tallahassee, FL', lat: 30.398, lon: -84.329 },
-  { id: 'KBUF', name: 'Buffalo, NY', lat: 42.949, lon: -78.736 },
-  { id: 'KLOT', name: 'Chicago, IL', lat: 41.604, lon: -88.084 },
-  { id: 'KDVN', name: 'Davenport, IA', lat: 41.612, lon: -90.581 },
-  { id: 'KAMA', name: 'Amarillo, TX', lat: 35.233, lon: -101.709 },
-  { id: 'KHGX', name: 'Houston/Galveston, TX', lat: 29.472, lon: -95.079 },
-  { id: 'KMHX', name: 'Morehead City, NC', lat: 34.776, lon: -76.876 },
-  { id: 'KDIX', name: 'Mt. Holly, NJ', lat: 39.947, lon: -74.411 },
-  { id: 'KABR', name: 'Aberdeen, SD', lat: 45.456, lon: -98.413 },
-  { id: 'KGGW', name: 'Glasgow, MT', lat: 48.212, lon: -106.625 },
-  { id: 'KRIW', name: 'Riverton, WY', lat: 43.066, lon: -108.477 },
-  { id: 'KFTG', name: 'Denver/Boulder, CO', lat: 39.786, lon: -104.545 },
-  { id: 'KPUX', name: 'Pueblo, CO', lat: 38.459, lon: -104.181 },
-  { id: 'KATX', name: 'Seattle/Tacoma, WA', lat: 48.194, lon: -122.496 }
-];
-
 const state = {
-  selectedRadarSite: 'KTLX',
-  selectedRadarProduct: 'N0Q',
-  colors: {
-    regular: '#f7b500', pds: '#ff4d4f', emergency: '#8f1d2c', watch: '#7c3aed', mcd: '#0ea5e9'
+  theme: 'dark',
+  radar: {
+    level: 'level3',
+    site: 'KTLX',
+    product: 'N0Q',
+    opacity: 0.85,
+    frameCount: 12,
+    frameIndex: 11,
+    playing: false,
+    timer: null
+  },
+  settingsCategory: 'radarRendering',
+  styles: {
+    tornado_radar: { label: 'Tornado Warning · Radar Indicated', color: '#ffc107', weight: 2, visible: true },
+    tornado_observed: { label: 'Tornado Warning · Observed', color: '#ff7043', weight: 2, visible: true },
+    tornado_pds: { label: 'Tornado Warning · Particularly Dangerous Situation', color: '#ff1744', weight: 3, visible: true },
+    tornado_emergency: { label: 'Tornado Warning · Emergency', color: '#9b0000', weight: 3, visible: true },
+    severe_warning: { label: 'Severe Thunderstorm Warning', color: '#fdd835', weight: 2, visible: true },
+    flood_warning: { label: 'Flash Flood Warning', color: '#43a047', weight: 2, visible: true },
+    watch_tornado: { label: 'Tornado Watch', color: '#8e24aa', weight: 2, visible: true },
+    watch_severe: { label: 'Severe Thunderstorm Watch', color: '#5e35b1', weight: 2, visible: true },
+    advisory_general: { label: 'Advisories (General)', color: '#42a5f5', weight: 1, visible: true }
   }
 };
 
+const radarProducts = {
+  Reflectivity: 'N0Q',
+  'Base Reflectivity': 'N0Q',
+  'Composite Reflectivity': 'NCR',
+  Velocity: 'N0U',
+  'Base Velocity': 'N0U',
+  'Storm Relative Velocity': 'N0S',
+  'Correlation Coefficient (CC)': 'N0C',
+  'Differential Reflectivity (ZDR)': 'N0X',
+  'Specific Differential Phase (KDP)': 'N0K',
+  'Echo Tops': 'EET',
+  'Vertically Integrated Liquid (VIL)': 'N0V',
+  'One Hour Precipitation': 'DAA'
+};
+
+const nexradSites = [
+  ['KTLX', 'Oklahoma City, OK', 35.333, -97.277], ['KFDR', 'Frederick, OK', 34.362, -98.976], ['KVNX', 'Vance AFB, OK', 36.741, -98.127],
+  ['KDGX', 'Brandon, MS', 32.280, -89.985], ['KBMX', 'Birmingham, AL', 33.171, -86.769], ['KFFC', 'Peachtree City, GA', 33.363, -84.566],
+  ['KTLH', 'Tallahassee, FL', 30.398, -84.329], ['KMLB', 'Melbourne, FL', 28.113, -80.654], ['KAMX', 'Miami, FL', 25.611, -80.413],
+  ['KBUF', 'Buffalo, NY', 42.949, -78.736], ['KTYX', 'Fort Drum, NY', 43.756, -75.681], ['KOKX', 'New York, NY', 40.865, -72.864],
+  ['KLOT', 'Chicago, IL', 41.604, -88.084], ['KILX', 'Lincoln, IL', 40.151, -89.337], ['KDVN', 'Davenport, IA', 41.612, -90.581],
+  ['KDMX', 'Des Moines, IA', 41.731, -93.723], ['KOAX', 'Omaha, NE', 41.320, -96.367], ['KLNX', 'North Platte, NE', 41.957, -100.576],
+  ['KAMA', 'Amarillo, TX', 35.233, -101.709], ['KLBB', 'Lubbock, TX', 33.654, -101.814], ['KHGX', 'Houston/Galveston, TX', 29.472, -95.079],
+  ['KEWX', 'Austin/San Antonio, TX', 29.704, -98.029], ['KCRP', 'Corpus Christi, TX', 27.784, -97.511], ['KSHV', 'Shreveport, LA', 32.451, -93.841],
+  ['KMHX', 'Morehead City, NC', 34.776, -76.876], ['KRAX', 'Raleigh, NC', 35.665, -78.490], ['KCLX', 'Charleston, SC', 32.655, -81.043],
+  ['KDIX', 'Mt. Holly, NJ', 39.947, -74.411], ['KDOX', 'Dover, DE', 38.826, -75.440], ['KAKQ', 'Wakefield, VA', 36.983, -77.008],
+  ['KABR', 'Aberdeen, SD', 45.456, -98.413], ['KGGW', 'Glasgow, MT', 48.212, -106.625], ['KTFX', 'Great Falls, MT', 47.459, -111.385],
+  ['KRIW', 'Riverton, WY', 43.066, -108.477], ['KFTG', 'Denver/Boulder, CO', 39.786, -104.545], ['KPUX', 'Pueblo, CO', 38.459, -104.181],
+  ['KGJX', 'Grand Junction, CO', 39.062, -108.214], ['KATX', 'Seattle/Tacoma, WA', 48.194, -122.496], ['KRTX', 'Portland, OR', 45.715, -122.965],
+  ['KMUX', 'San Francisco Bay, CA', 37.156, -121.898], ['KNKX', 'San Diego, CA', 32.919, -117.041], ['KYUX', 'Yuma, AZ', 32.495, -114.657]
+].map(([id, name, lat, lon]) => ({ id, name, lat, lon }));
+
+const basemaps = {
+  'Carto Dark': L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap &copy; CARTO' }),
+  'Carto Light': L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap &copy; CARTO' }),
+  'OpenStreetMap': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }),
+  Satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri' })
+};
+
+const map = L.map('map', {
+  zoomControl: true, worldCopyJump: true, inertia: true, inertiaDeceleration: 2600,
+  easeLinearity: 0.15, zoomAnimation: true, fadeAnimation: true, markerZoomAnimation: true, preferCanvas: true
+}).setView([36, -97], 4);
+
+let activeBasemap = basemaps['Carto Dark'].addTo(map);
 let radarLayer;
-const radarSitesLayer = L.layerGroup().addTo(map);
+const siteLayer = L.layerGroup().addTo(map);
 const drawLayer = new L.FeatureGroup().addTo(map);
+const nwsAlertLayer = L.geoJSON(null, { style: styleNwsFeature, onEachFeature: bindNwsPopup }).addTo(map);
+const spcWatchLayer = L.geoJSON(null, { style: { color: '#9c27b0', weight: 2, fillOpacity: 0.1 } }).addTo(map);
+const mcdLayer = L.geoJSON(null, { style: { color: '#03a9f4', weight: 2, dashArray: '5 4', fillOpacity: 0.08 } }).addTo(map);
 
 map.addControl(new L.Control.Draw({ edit: { featureGroup: drawLayer }, draw: { circlemarker: false } }));
 map.on(L.Draw.Event.CREATED, e => drawLayer.addLayer(e.layer));
 
-const warningLayer = L.geoJSON(null, {
-  style: f => ({ color: getWarningColor(f.properties), weight: 2, fillOpacity: 0.16 }),
-  onEachFeature: (f, layer) => {
-    const p = f.properties || {};
-    layer.bindPopup(`<b>${p.event || 'Warning'}</b><br>${p.headline || ''}<br><small>${p.areaDesc || ''}</small>`);
-const map = L.map('map', { zoomControl: true }).setView([25, 0], 3);
+function bindNwsPopup(feature, layer) {
+  const p = feature.properties || {};
+  layer.bindPopup(`<b>${p.event || 'Alert'}</b><br>${p.headline || ''}<br><small>${p.areaDesc || ''}</small>`);
+}
 
-const basemapDefs = {
-  "Light (Carto)": L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap &copy; CARTO' }),
-  "Dark (Carto)": L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap &copy; CARTO' }),
-  "OpenStreetMap": L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }),
-  "ESRI Satellite": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri' })
-};
-
-const radarProducts = {
-  "Global Radar (RainViewer)": {
-    url: 'https://tilecache.rainviewer.com/v2/radar/nowcast_0/256/{z}/{x}/{y}/6/1_1.png',
-    attribution: 'RainViewer',
-    type: 'rainviewer'
-  },
-  "NEXRAD Base Reflectivity": {
-    url: 'https://opengeo.ncep.noaa.gov/geoserver/conus/conus_cref_raw/ows?service=WMS&version=1.1.1&request=GetMap&layers=conus_cref_raw&styles=&format=image/png&transparent=true&srs=EPSG:3857&bbox={bbox-epsg-3857}&width=256&height=256',
-    attribution: 'NOAA NCEP',
-    type: 'wms'
-  },
-  "MRMS Composite Reflectivity": {
-    url: 'https://idpgis.ncep.noaa.gov/arcgis/services/NWS_Observations/radar_base_reflectivity/MapServer/WMSServer?service=WMS&request=GetMap&layers=0&styles=&format=image/png&transparent=true&version=1.1.1&srs=EPSG:3857&bbox={bbox-epsg-3857}&width=256&height=256',
-    attribution: 'NOAA MRMS',
-    type: 'wms'
+function classifyAlert(props = {}) {
+  const event = (props.event || '').toLowerCase();
+  const text = `${props.description || ''} ${props.headline || ''}`.toLowerCase();
+  if (event.includes('tornado warning')) {
+    if (text.includes('emergency')) return 'tornado_emergency';
+    if (text.includes('particularly dangerous situation') || text.includes('pds')) return 'tornado_pds';
+    if (text.includes('observed') || text.includes('confirmed')) return 'tornado_observed';
+    return 'tornado_radar';
   }
-};
+  if (event.includes('severe thunderstorm warning')) return 'severe_warning';
+  if (event.includes('flash flood warning')) return 'flood_warning';
+  if (event.includes('tornado watch')) return 'watch_tornado';
+  if (event.includes('severe thunderstorm watch')) return 'watch_severe';
+  if (event.includes('advisory')) return 'advisory_general';
+  return 'advisory_general';
+}
 
-let activeBasemap = basemapDefs['Light (Carto)'].addTo(map);
-let activeRadar;
+function styleNwsFeature(feature) {
+  const key = classifyAlert(feature.properties);
+  const cfg = state.styles[key] || state.styles.advisory_general;
+  return { color: cfg.color, weight: cfg.weight, fillOpacity: 0.13 };
+}
 
-function buildTileLayer(def) {
-  if (def.type === 'wms') {
-    return L.tileLayer.wms(def.url.split('?')[0], {
-      layers: /layers=([^&]+)/.exec(def.url)?.[1] || '0',
-      format: 'image/png',
-      transparent: true,
-      attribution: def.attribution,
-      opacity: Number(document.getElementById('radarOpacity').value)
+function alertVisible(props) {
+  const cfg = state.styles[classifyAlert(props)] || state.styles.advisory_general;
+  return cfg.visible;
+}
+
+function level3TileUrl(site, product, frameOffset) {
+  return `https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::${site}-${product}-${frameOffset}/{z}/{x}/{y}.png`;
+}
+
+function level2TileUrl(product) {
+  const l2ProductMap = {
+    N0Q: 'conus_cref_raw', NCR: 'conus_cref_raw', N0U: 'conus_bref_qcd', N0S: 'conus_bref_qcd',
+    N0C: 'conus_cref_raw', N0X: 'conus_cref_raw', N0K: 'conus_cref_raw', EET: 'conus_cref_raw', N0V: 'conus_cref_raw', DAA: 'conus_cref_raw'
+  };
+  const layer = l2ProductMap[product] || 'conus_cref_raw';
+  return { base: 'https://opengeo.ncep.noaa.gov/geoserver/conus/wms', layer };
+}
+
+function rebuildRadarLayer() {
+  if (radarLayer) map.removeLayer(radarLayer);
+  if (state.radar.level === 'level3') {
+    const frameOffset = state.radar.frameCount - 1 - state.radar.frameIndex;
+    radarLayer = L.tileLayer(level3TileUrl(state.radar.site, state.radar.product, frameOffset), {
+      attribution: 'IEM / NOAA NEXRAD Level III', opacity: state.radar.opacity, maxZoom: 10
+    }).addTo(map);
+  } else {
+    const def = level2TileUrl(state.radar.product);
+    radarLayer = L.tileLayer.wms(def.base, {
+      layers: def.layer, format: 'image/png', transparent: true, opacity: state.radar.opacity, version: '1.1.1', attribution: 'NOAA NCEP (L2 mosaic)'
+    }).addTo(map);
+  }
+  updateTimestamp();
+  updateSiteMeta();
+}
+
+function updateTimestamp() {
+  const minutesAgo = (state.radar.frameCount - 1 - state.radar.frameIndex) * 5;
+  const t = new Date(Date.now() - minutesAgo * 60000);
+  document.getElementById('timestampLabel').textContent = t.toLocaleString();
+  document.getElementById('timelineSlider').value = String(state.radar.frameIndex);
+}
+
+function updateSiteMeta() {
+  const site = nexradSites.find(s => s.id === state.radar.site);
+  const levelLabel = state.radar.level === 'level3' ? 'Level III Site' : 'Level II Mosaic';
+  document.getElementById('siteMeta').innerHTML = `${site?.id || ''} — ${site?.name || ''}<br>Product: ${state.radar.product} · ${levelLabel}<br>Source: NOAA / IEM`;
+}
+
+function addSiteMarkers() {
+  siteLayer.clearLayers();
+  nexradSites.forEach(site => {
+    const marker = L.circleMarker([site.lat, site.lon], { radius: 5.5, color: '#77a5ff', fillColor: '#1f4ec7', fillOpacity: 0.9, weight: 2 });
+    marker.bindTooltip(`${site.id} · ${site.name}`);
+    marker.on('click', async () => {
+      state.radar.site = site.id;
+      map.flyTo([site.lat, site.lon], Math.max(7, map.getZoom()), { duration: 0.9 });
+      rebuildRadarLayer();
+      await fetchSiteMetadata(site.id);
     });
-  }
-  return L.tileLayer(def.url, {
-    attribution: def.attribution,
-    opacity: Number(document.getElementById('radarOpacity').value)
+    marker.addTo(siteLayer);
   });
 }
 
-function setRadarLayer(productName) {
-  if (activeRadar) map.removeLayer(activeRadar);
-  activeRadar = buildTileLayer(radarProducts[productName]);
-  activeRadar.addTo(map);
+async function fetchSiteMetadata(siteId) {
+  try {
+    const res = await fetch(`https://api.weather.gov/radar/stations/${siteId}`);
+    if (!res.ok) return;
+    const json = await res.json();
+    const p = json.properties || {};
+    document.getElementById('siteMeta').innerHTML = `${siteId} — ${p.name || 'NEXRAD Site'}<br>Product: ${state.radar.product} · ${state.radar.level.toUpperCase()}<br>Elevation: ${p.elevation?.value ? Math.round(p.elevation.value) + 'm' : 'N/A'} · Timezone: ${p.timeZone || 'N/A'}`;
+  } catch {}
 }
 
-const basemapSelect = document.getElementById('basemapSelect');
-Object.keys(basemapDefs).forEach(name => {
-  basemapSelect.add(new Option(name, name));
-});
+function populateSelectors() {
+  const radarProductSelect = document.getElementById('radarProductSelect');
+  Object.entries(radarProducts).forEach(([name, code]) => radarProductSelect.add(new Option(name, code)));
+  radarProductSelect.value = state.radar.product;
+  radarProductSelect.addEventListener('change', e => { state.radar.product = e.target.value; rebuildRadarLayer(); });
 
-const radarSelect = document.getElementById('radarProductSelect');
-Object.keys(radarProducts).forEach(name => radarSelect.add(new Option(name, name)));
-radarSelect.value = 'Global Radar (RainViewer)';
-setRadarLayer(radarSelect.value);
-
-basemapSelect.addEventListener('change', () => {
-  map.removeLayer(activeBasemap);
-  activeBasemap = basemapDefs[basemapSelect.value].addTo(map);
-});
-
-radarSelect.addEventListener('change', () => setRadarLayer(radarSelect.value));
-document.getElementById('radarOpacity').addEventListener('input', e => {
-  if (activeRadar) activeRadar.setOpacity(Number(e.target.value));
-});
-
-const drawingLayer = new L.FeatureGroup().addTo(map);
-map.addControl(new L.Control.Draw({
-  edit: { featureGroup: drawingLayer },
-  draw: { circlemarker: false }
-}));
-map.on(L.Draw.Event.CREATED, e => drawingLayer.addLayer(e.layer));
-
-const styleState = {
-  regular: '#ffbf00',
-  pds: '#ff4500',
-  emergency: '#b00020',
-  watch: '#9c27b0',
-  mcd: '#1976d2'
-};
-
-const warningLayer = L.geoJSON(null, {
-  style: feature => ({ color: getWarningColor(feature.properties), weight: 2, fillOpacity: 0.15 }),
-  onEachFeature: (feature, layer) => {
-    const p = feature.properties;
-    layer.bindPopup(`<b>${p.event || 'Warning'}</b><br>${p.headline || ''}<br><small>${p.severity || ''} ${p.urgency || ''}</small>`);
-  }
-}).addTo(map);
-
-const watchLayer = L.geoJSON(null, {
-  style: { color: state.colors.watch, weight: 2, fillOpacity: 0.12 },
-  onEachFeature: (f, l) => l.bindPopup(`<b>Watch ${f.properties.NUM || ''}</b><br>${f.properties.TYPE || ''}`)
-}).addTo(map);
-
-const mcdLayer = L.geoJSON(null, {
-  style: { color: state.colors.mcd, weight: 2, fillOpacity: 0.08, dashArray: '5 4' },
-  onEachFeature: (f, l) => l.bindPopup(`<b>MCD ${f.properties.mcdnum || ''}</b><br>${f.properties.attnwsfo || ''}`)
-}).addTo(map);
-
-function setupTabs() {
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(x => x.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(btn.dataset.tab).classList.add('active');
-    });
+  document.getElementById('radarDataModeSelect').addEventListener('change', e => {
+    state.radar.level = e.target.value;
+    rebuildRadarLayer();
   });
-}
 
-function setupSelectors() {
+  const modelSelect = document.getElementById('modelSelect');
+  ['GFS', 'RAP', 'NAM', 'HRRR', 'RRFS'].forEach(m => modelSelect.add(new Option(m, m)));
+
   const basemapSelect = document.getElementById('basemapSelect');
-  Object.keys(basemaps).forEach(k => basemapSelect.add(new Option(k, k)));
+  Object.keys(basemaps).forEach(name => basemapSelect.add(new Option(name, name)));
   basemapSelect.value = 'Carto Dark';
   basemapSelect.addEventListener('change', () => {
     map.removeLayer(activeBasemap);
     activeBasemap = basemaps[basemapSelect.value].addTo(map);
   });
+}
 
-  const radarProductSelect = document.getElementById('radarProductSelect');
-  Object.entries(radarProducts).forEach(([name, code]) => radarProductSelect.add(new Option(name, code)));
-  radarProductSelect.value = state.selectedRadarProduct;
-  radarProductSelect.addEventListener('change', () => {
-    state.selectedRadarProduct = radarProductSelect.value;
-    updateRadarLayer();
-    updateSelectedSiteCard();
+function setPlaying(playing) {
+  state.radar.playing = playing;
+  document.getElementById('playPauseBtn').textContent = playing ? '⏸' : '▶';
+  if (state.radar.timer) clearInterval(state.radar.timer);
+  if (playing) {
+    state.radar.timer = setInterval(() => {
+      state.radar.frameIndex = (state.radar.frameIndex + 1) % state.radar.frameCount;
+      rebuildRadarLayer();
+    }, 700);
+  }
+}
+
+function bindOverlayControls() {
+  document.getElementById('playPauseBtn').addEventListener('click', () => setPlaying(!state.radar.playing));
+  document.getElementById('stepBackBtn').addEventListener('click', () => {
+    state.radar.frameIndex = Math.max(0, state.radar.frameIndex - 1);
+    rebuildRadarLayer();
   });
-
-  document.getElementById('radarOpacity').addEventListener('input', updateRadarLayer);
-
-  const modelSelect = document.getElementById('modelSelect');
-  ['GFS', 'RAP', 'NAM', 'HRRR', 'RRFS'].forEach(m => modelSelect.add(new Option(m, m)));
-}
-
-function tileUrlForSite(siteId, productCode) {
-  return `https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::${siteId}-${productCode}-0/{z}/{x}/{y}.png`;
-}
-
-function updateRadarLayer() {
-  if (radarLayer) map.removeLayer(radarLayer);
-  radarLayer = L.tileLayer(tileUrlForSite(state.selectedRadarSite, state.selectedRadarProduct), {
-    attribution: 'IEM / NOAA NEXRAD',
-    opacity: Number(document.getElementById('radarOpacity').value),
-    maxZoom: 10
-  }).addTo(map);
-}
-
-function addRadarSites() {
-  radarSitesLayer.clearLayers();
-  nexradSites.forEach(site => {
-    const marker = L.circleMarker([site.lat, site.lon], {
-      radius: 6,
-      color: '#60a5fa',
-      weight: 2,
-      fillColor: '#1d4ed8',
-      fillOpacity: 0.85
-    });
-    marker.bindTooltip(`${site.id} · ${site.name}`);
-    marker.on('click', () => {
-      state.selectedRadarSite = site.id;
-      map.flyTo([site.lat, site.lon], Math.max(map.getZoom(), 7), { duration: 0.9, easeLinearity: 0.2 });
-      updateRadarLayer();
-      fetchRadarStationInfo(site.id);
-      updateSelectedSiteCard();
-    });
-    marker.addTo(radarSitesLayer);
+  document.getElementById('stepForwardBtn').addEventListener('click', () => {
+    state.radar.frameIndex = Math.min(state.radar.frameCount - 1, state.radar.frameIndex + 1);
+    rebuildRadarLayer();
+  });
+  document.getElementById('timelineSlider').addEventListener('input', e => {
+    state.radar.frameIndex = Number(e.target.value);
+    rebuildRadarLayer();
+  });
+  document.getElementById('snapshotBtn').addEventListener('click', () => {
+    const center = map.getCenter();
+    alert(`Snapshot marker\nCenter: ${center.lat.toFixed(2)}, ${center.lng.toFixed(2)}\nTime: ${document.getElementById('timestampLabel').textContent}`);
   });
 }
 
-async function fetchRadarStationInfo(stationId) {
-  const card = document.getElementById('selectedSiteCard');
-  card.innerHTML = `Loading station metadata for <b>${stationId}</b>...`;
-  try {
-    const res = await fetch(`https://api.weather.gov/radar/stations/${stationId}`);
-    const j = await res.json();
-    const p = j.properties || {};
-    card.innerHTML = `<b>${stationId}</b> - ${p.name || 'NEXRAD Site'}<br>
-      Product: <b>${state.selectedRadarProduct}</b><br>
-      Timezone: ${p.timeZone || 'N/A'}<br>
-      Elevation: ${p.elevation?.value ? `${Math.round(p.elevation.value)} m` : 'N/A'}<br>
-      Status: ${p.rda?.properties?.status || 'Operational'}`;
-  } catch {
-    updateSelectedSiteCard();
-  }
-}
-
-function updateSelectedSiteCard() {
-  const site = nexradSites.find(s => s.id === state.selectedRadarSite);
-  document.getElementById('selectedSiteCard').innerHTML = `<b>${site?.id || ''}</b> — ${site?.name || ''}<br>
-  Product code: <b>${state.selectedRadarProduct}</b><br>
-  Source: NOAA / IEM Level-III tiles`;
-}
-  style: { color: styleState.watch, weight: 2, fillOpacity: 0.1 },
-  onEachFeature: (feature, layer) => {
-    layer.bindPopup(`<b>Watch ${feature.properties.NUM || ''}</b><br>${feature.properties.TYPE || ''}`);
-  }
-}).addTo(map);
-
-const mcdLayer = L.geoJSON(null, {
-  style: { color: styleState.mcd, weight: 2, dashArray: '5,5', fillOpacity: 0.07 },
-  onEachFeature: (feature, layer) => {
-    layer.bindPopup(`<b>MCD ${feature.properties.mcdnum || ''}</b><br>${feature.properties.attnwsfo || ''}`);
-  }
-}).addTo(map);
-
-function warningCategory(props = {}) {
-  const text = `${props.description || ''} ${props.headline || ''} ${props.event || ''}`.toLowerCase();
-  if (text.includes('emergency') || text.includes('destructive')) return 'emergency';
-  if (text.includes('considerable') || text.includes('particularly dangerous situation') || text.includes('pds')) return 'pds';
-  return 'regular';
-}
-
-function getWarningColor(props) {
-  return state.colors[warningCategory(props)];
-}
-
-function warningAllowed(p) {
-  if (!document.getElementById('toggleWarnings').checked) return false;
-  const cat = warningCategory(p);
-  if (cat === 'regular') return document.getElementById('toggleRegular').checked;
-  if (cat === 'pds') return document.getElementById('togglePds').checked;
-  return document.getElementById('toggleEmergency').checked;
-}
-
-async function fetchWarnings() {
+async function fetchNwsAlerts() {
   try {
     const res = await fetch('https://api.weather.gov/alerts/active?status=actual&message_type=alert');
-    const j = await res.json();
-    warningLayer.clearLayers();
-    warningLayer.addData({ type: 'FeatureCollection', features: (j.features || []).filter(f => f.geometry && warningAllowed(f.properties)) });
-    warningLayer.eachLayer(layer => layer.setStyle({ color: getWarningColor(layer.feature.properties) }));
-  } catch (e) {
-    console.error(e);
-  }
+    if (!res.ok) return;
+    const json = await res.json();
+    const features = (json.features || []).filter(f => f.geometry && alertVisible(f.properties));
+    nwsAlertLayer.clearLayers();
+    nwsAlertLayer.addData({ type: 'FeatureCollection', features });
+    nwsAlertLayer.eachLayer(layer => layer.setStyle(styleNwsFeature(layer.feature)));
+  } catch {}
 }
 
 async function fetchSpc() {
   try {
-    const [w, m] = await Promise.all([
+    const [watchJson, mcdJson] = await Promise.all([
       fetch('https://www.spc.noaa.gov/products/watch/watches.json').then(r => r.json()),
       fetch('https://www.spc.noaa.gov/products/md/validmd.geojson').then(r => r.json())
     ]);
-    watchLayer.clearLayers();
+    spcWatchLayer.clearLayers();
     mcdLayer.clearLayers();
-    if (w.features) watchLayer.addData({ type: 'FeatureCollection', features: w.features });
-    if (m.features) mcdLayer.addData(m);
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-function applyLayerStyles() {
-  state.colors.regular = document.getElementById('regularColor').value;
-  state.colors.pds = document.getElementById('pdsColor').value;
-  state.colors.emergency = document.getElementById('emergencyColor').value;
-  state.colors.watch = document.getElementById('watchColor').value;
-  state.colors.mcd = document.getElementById('mcdColor').value;
-  warningLayer.eachLayer(l => l.setStyle({ color: getWarningColor(l.feature.properties) }));
-  watchLayer.setStyle({ color: state.colors.watch });
-  mcdLayer.setStyle({ color: state.colors.mcd });
-  renderLegend();
-}
-
-function bindLayerControls() {
-  ['toggleWarnings', 'toggleRegular', 'togglePds', 'toggleEmergency'].forEach(id => {
-    document.getElementById(id).addEventListener('change', fetchWarnings);
-  });
-  document.getElementById('toggleWatches').addEventListener('change', syncVisibility);
-  document.getElementById('toggleMcd').addEventListener('change', syncVisibility);
-  ['regularColor', 'pdsColor', 'emergencyColor', 'watchColor', 'mcdColor'].forEach(id => {
-    document.getElementById(id).addEventListener('input', applyLayerStyles);
-  });
-  document.getElementById('toggleRadarSites').addEventListener('change', e => {
-    if (e.target.checked) map.addLayer(radarSitesLayer);
-    else map.removeLayer(radarSitesLayer);
-  });
-}
-
-function syncVisibility() {
-  const category = warningCategory(props);
-  return styleState[category];
-}
-
-function warningVisible(props) {
-  const category = warningCategory(props);
-  const master = document.getElementById('toggleWarnings').checked;
-  const allowRegular = document.getElementById('toggleWarningRegular').checked;
-  const allowPds = document.getElementById('toggleWarningPds').checked;
-  const allowEmergency = document.getElementById('toggleWarningEmergency').checked;
-  if (!master) return false;
-  if (category === 'regular') return allowRegular;
-  if (category === 'pds') return allowPds;
-  return allowEmergency;
-}
-
-async function fetchNwsWarnings() {
-  try {
-    const res = await fetch('https://api.weather.gov/alerts/active?status=actual&message_type=alert');
-    const json = await res.json();
-    const filtered = {
-      type: 'FeatureCollection',
-      features: (json.features || []).filter(f => f.geometry && warningVisible(f.properties))
-    };
-    warningLayer.clearLayers();
-    warningLayer.addData(filtered);
-    warningLayer.eachLayer(layer => layer.setStyle({ color: getWarningColor(layer.feature.properties) }));
-  } catch (err) {
-    console.error('Warning feed error', err);
-  }
-}
-
-async function fetchSpcProducts() {
-  try {
-    const [watchRes, mcdRes] = await Promise.all([
-      fetch('https://www.spc.noaa.gov/products/watch/watches.json'),
-      fetch('https://www.spc.noaa.gov/products/md/validmd.geojson')
-    ]);
-    const watchJson = await watchRes.json();
-    const mcdJson = await mcdRes.json();
-
-    watchLayer.clearLayers();
-    if (watchJson.features) {
-      watchLayer.addData({ type: 'FeatureCollection', features: watchJson.features });
-    }
-
-    mcdLayer.clearLayers();
-    if (mcdJson.features) {
-      mcdLayer.addData(mcdJson);
-    }
-  } catch (err) {
-    console.error('SPC products unavailable', err);
-  }
-}
-
-const layerToggles = ['toggleWarnings', 'toggleWatches', 'toggleMcd', 'toggleWarningRegular', 'toggleWarningPds', 'toggleWarningEmergency'];
-layerToggles.forEach(id => document.getElementById(id).addEventListener('change', () => {
-  warningLayer.clearLayers();
-  fetchNwsWarnings();
-  toggleVisibility();
-}));
-
-function toggleVisibility() {
-  document.getElementById('toggleWatches').checked ? map.addLayer(watchLayer) : map.removeLayer(watchLayer);
-  document.getElementById('toggleMcd').checked ? map.addLayer(mcdLayer) : map.removeLayer(mcdLayer);
+    if (watchJson.features) spcWatchLayer.addData({ type: 'FeatureCollection', features: watchJson.features });
+    if (mcdJson.features) mcdLayer.addData(mcdJson);
+  } catch {}
 }
 
 function renderLegend() {
-  const entries = [
-    ['Regular Warning', state.colors.regular],
-    ['PDS Warning', state.colors.pds],
-    ['Emergency Warning', state.colors.emergency],
-    ['Watch', state.colors.watch],
-    ['MCD', state.colors.mcd],
-    ['NEXRAD Site', '#1d4ed8']
+  const items = [
+    ['Radar Sites', '#1f4ec7'],
+    ['Tornado Warning', state.styles.tornado_observed.color],
+    ['Severe Warning', state.styles.severe_warning.color],
+    ['Flood Warning', state.styles.flood_warning.color],
+    ['Watch', state.styles.watch_tornado.color],
+    ['Advisory', state.styles.advisory_general.color]
   ];
-  document.getElementById('legend').innerHTML = entries.map(([n, c]) => `<li><span class="swatch" style="background:${c}"></span>${n}</li>`).join('');
+  document.getElementById('legend').innerHTML = items.map(([n, c]) => `<li><span class="swatch" style="background:${c}"></span>${n}</li>`).join('');
 }
 
-function mappedModelCode(label) {
-  if (label === 'HRRR') return 'hrrr';
-  if (label === 'GFS') return 'gfs_global';
+function openSettings() {
+  document.getElementById('settingsModal').classList.add('open');
+  document.getElementById('settingsModal').setAttribute('aria-hidden', 'false');
+  renderSettings();
+}
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('open');
+  document.getElementById('settingsModal').setAttribute('aria-hidden', 'true');
+}
+
+function settingsCategories() {
+  return [
+    { key: 'radarRendering', label: 'Radar Rendering' },
+    { key: 'warnings', label: 'Warnings' },
+    { key: 'watches', label: 'Watches' },
+    { key: 'advisories', label: 'Advisories' },
+    { key: 'appearance', label: 'Appearance' }
+  ];
+}
+
+function styleRows(keys) {
+  return keys.map(key => {
+    const s = state.styles[key];
+    return `<div class="setting-card"><div class="setting-row">
+      <div>${s.label}</div>
+      <button class="eye-btn" data-action="toggle-visible" data-key="${key}">${s.visible ? '👁 Visible' : '🚫 Hidden'}</button>
+      <input type="color" data-action="set-color" data-key="${key}" value="${s.color}" />
+      <select data-action="set-weight" data-key="${key}">
+        ${[1,2,3,4].map(w => `<option value="${w}" ${s.weight === w ? 'selected' : ''}>${w}px</option>`).join('')}
+      </select>
+    </div></div>`;
+  }).join('');
+}
+
+function renderSettings() {
+  const nav = document.getElementById('settingsNav');
+  nav.innerHTML = settingsCategories().map(c => `<button class="btn ${state.settingsCategory === c.key ? 'btn-primary' : ''}" data-setting-category="${c.key}">${c.label}</button>`).join('');
+
+  const content = document.getElementById('settingsContent');
+  if (state.settingsCategory === 'radarRendering') {
+    content.innerHTML = `<h3>Radar Settings</h3>
+      <label>Radar Opacity
+        <input id="radarOpacitySetting" type="range" min="0.2" max="1" step="0.05" value="${state.radar.opacity}" />
+      </label>
+      <p class="hint">Opacity moved to Settings per request. Overlay stays compact.</p>`;
+  } else if (state.settingsCategory === 'warnings') {
+    content.innerHTML = `<h3>Warnings</h3><p class="hint">Each warning subtype has independent visibility + style.</p>${styleRows(['tornado_radar','tornado_observed','tornado_pds','tornado_emergency','severe_warning','flood_warning'])}`;
+  } else if (state.settingsCategory === 'watches') {
+    content.innerHTML = `<h3>Watches</h3>${styleRows(['watch_tornado','watch_severe'])}`;
+  } else if (state.settingsCategory === 'advisories') {
+    content.innerHTML = `<h3>Advisories</h3>${styleRows(['advisory_general'])}`;
+  } else {
+    content.innerHTML = `<h3>Appearance</h3><p class="hint">Theme mode and UI density are controlled here.</p>
+      <button class="btn" id="themeToggleInside">Toggle Theme</button>`;
+  }
+
+  nav.querySelectorAll('[data-setting-category]').forEach(btn => btn.addEventListener('click', () => {
+    state.settingsCategory = btn.dataset.settingCategory;
+    renderSettings();
+  }));
+
+  const opacityInput = document.getElementById('radarOpacitySetting');
+  if (opacityInput) opacityInput.addEventListener('input', e => {
+    state.radar.opacity = Number(e.target.value);
+    rebuildRadarLayer();
+  });
+
+  const insideToggle = document.getElementById('themeToggleInside');
+  if (insideToggle) insideToggle.addEventListener('click', toggleTheme);
+
+  content.querySelectorAll('[data-action]').forEach(el => {
+    el.addEventListener('input', onSettingAction);
+    el.addEventListener('change', onSettingAction);
+    el.addEventListener('click', onSettingAction);
+  });
+}
+
+function onSettingAction(e) {
+  const key = e.target.dataset.key;
+  const action = e.target.dataset.action;
+  if (!key || !action) return;
+  if (action === 'toggle-visible') state.styles[key].visible = !state.styles[key].visible;
+  if (action === 'set-color') state.styles[key].color = e.target.value;
+  if (action === 'set-weight') state.styles[key].weight = Number(e.target.value);
+  renderSettings();
+  fetchNwsAlerts();
+  renderLegend();
+}
+
+function bindGlobalControls() {
+  document.getElementById('openSettingsBtn').addEventListener('click', openSettings);
+  document.getElementById('closeSettingsBtn').addEventListener('click', closeSettings);
+  document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+  document.getElementById('toggleRadarSites').addEventListener('change', e => e.target.checked ? map.addLayer(siteLayer) : map.removeLayer(siteLayer));
+  document.getElementById('toggleSpcWatches').addEventListener('change', e => e.target.checked ? map.addLayer(spcWatchLayer) : map.removeLayer(spcWatchLayer));
+  document.getElementById('toggleMcd').addEventListener('change', e => e.target.checked ? map.addLayer(mcdLayer) : map.removeLayer(mcdLayer));
+}
+
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  state.theme = document.body.classList.contains('light') ? 'light' : 'dark';
+}
+
+function modelCode(selected) {
+  if (selected === 'HRRR') return 'hrrr';
   return 'gfs_global';
 }
 
-async function fetchModelData(lat, lon) {
-  const selectedModel = document.getElementById('modelSelect').value;
+async function fetchModelAtPoint(lat, lon) {
+  const model = document.getElementById('modelSelect').value;
   const field = document.getElementById('modelFieldSelect').value;
-  const modelCode = mappedModelCode(selectedModel);
+  const mCode = modelCode(model);
   const modelCard = document.getElementById('modelCard');
   const soundingCard = document.getElementById('soundingCard');
-
   modelCard.textContent = 'Loading model data...';
   soundingCard.textContent = 'Loading sounding...';
-
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(3)}&longitude=${lon.toFixed(3)}&models=${modelCode}&hourly=temperature_2m,windspeed_10m,temperature_850hPa,temperature_500hPa,relative_humidity_700hPa,cape&forecast_days=1&timezone=UTC`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(3)}&longitude=${lon.toFixed(3)}&models=${mCode}&hourly=temperature_2m,windspeed_10m,temperature_850hPa,temperature_500hPa,relative_humidity_700hPa,cape&forecast_days=1&timezone=UTC`;
     const res = await fetch(url);
+    if (!res.ok) throw new Error('Model request failed');
     const j = await res.json();
     const h = j.hourly || {};
-    const fieldValue = {
+    const v = {
       temp2m: `${h.temperature_2m?.[0] ?? 'N/A'} °C`,
       wind10m: `${h.windspeed_10m?.[0] ?? 'N/A'} km/h`,
       cape: `${h.cape?.[0] ?? 'N/A'} J/kg`,
       rh700: `${h.relative_humidity_700hPa?.[0] ?? 'N/A'} %`
     }[field];
-
-    modelCard.innerHTML = `<b>${selectedModel}</b> (provider: ${modelCode})<br>
-      Point: ${lat.toFixed(2)}, ${lon.toFixed(2)}<br>
-      Selected field: <b>${fieldValue}</b><br>
-      Temp 850mb: ${h.temperature_850hPa?.[0] ?? 'N/A'} °C · Temp 500mb: ${h.temperature_500hPa?.[0] ?? 'N/A'} °C`;
-
+    modelCard.innerHTML = `<b>${model}</b> (${mCode})<br>Point: ${lat.toFixed(2)}, ${lon.toFixed(2)}<br>Field: <b>${v}</b>`;
     const profile = [
-      ['1000mb', Number(h.temperature_2m?.[0] ?? 18)],
+      ['1000mb', Number(h.temperature_2m?.[0] ?? 20)],
       ['850mb', Number(h.temperature_850hPa?.[0] ?? 10)],
       ['700mb', Number(h.temperature_850hPa?.[0] ?? 10) - 8],
-      ['500mb', Number(h.temperature_500hPa?.[0] ?? -8)],
-      ['300mb', Number(h.temperature_500hPa?.[0] ?? -8) - 22]
+      ['500mb', Number(h.temperature_500hPa?.[0] ?? -10)],
+      ['300mb', Number(h.temperature_500hPa?.[0] ?? -10) - 20]
     ];
-    soundingCard.innerHTML = `<b>Quick sounding profile</b><br>${profile.map(([p, t]) => `${p}: ${t.toFixed(1)}°C`).join('<br>')}`;
+    soundingCard.innerHTML = `<b>Quick sounding</b><br>${profile.map(([p, t]) => `${p}: ${t.toFixed(1)}°C`).join('<br>')}`;
   } catch {
-    modelCard.textContent = 'Model unavailable.';
-function updateStyleInputs() {
-  styleState.regular = document.getElementById('warningRegularColor').value;
-  styleState.pds = document.getElementById('warningPdsColor').value;
-  styleState.emergency = document.getElementById('warningEmergencyColor').value;
-  styleState.watch = document.getElementById('watchColor').value;
-  styleState.mcd = document.getElementById('mcdColor').value;
-
-  warningLayer.eachLayer(layer => layer.setStyle({ color: getWarningColor(layer.feature.properties) }));
-  watchLayer.setStyle({ color: styleState.watch });
-  mcdLayer.setStyle({ color: styleState.mcd });
-  renderLegend();
-}
-
-['warningRegularColor', 'warningPdsColor', 'warningEmergencyColor', 'watchColor', 'mcdColor']
-  .forEach(id => document.getElementById(id).addEventListener('input', updateStyleInputs));
-
-const modelDataCard = document.getElementById('modelDataCard');
-const soundingCard = document.getElementById('soundingCard');
-
-async function fetchModelAndSounding(lat, lon) {
-  modelDataCard.textContent = 'Loading model guidance...';
-  soundingCard.textContent = 'Loading quick-look sounding...';
-  try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(3)}&longitude=${lon.toFixed(3)}&hourly=temperature_850hPa,temperature_500hPa,relative_humidity_700hPa,windspeed_10m&forecast_days=1&timezone=UTC`;
-    const res = await fetch(url);
-    const json = await res.json();
-    const h = json.hourly || {};
-
-    modelDataCard.innerHTML = `<b>Location:</b> ${lat.toFixed(2)}, ${lon.toFixed(2)}<br>
-      <b>T850:</b> ${h.temperature_850hPa?.[0] ?? 'N/A'} °C<br>
-      <b>T500:</b> ${h.temperature_500hPa?.[0] ?? 'N/A'} °C<br>
-      <b>RH700:</b> ${h.relative_humidity_700hPa?.[0] ?? 'N/A'} %<br>
-      <b>Surface Wind:</b> ${h.windspeed_10m?.[0] ?? 'N/A'} km/h`;
-
-    const profile = [
-      ['1000 hPa', (h.temperature_850hPa?.[0] ?? 15) + 6],
-      ['850 hPa', h.temperature_850hPa?.[0] ?? 10],
-      ['700 hPa', (h.temperature_850hPa?.[0] ?? 10) - 7],
-      ['500 hPa', h.temperature_500hPa?.[0] ?? -8],
-      ['300 hPa', (h.temperature_500hPa?.[0] ?? -8) - 20]
-    ];
-
-    soundingCard.innerHTML = `<b>Quick Sounding (Model-derived)</b><br>${profile.map(row => `${row[0]}: ${Number(row[1]).toFixed(1)}°C`).join('<br>')}`;
-  } catch (err) {
-    modelDataCard.textContent = 'Model data unavailable right now.';
+    modelCard.textContent = 'Model data unavailable.';
     soundingCard.textContent = 'Sounding unavailable.';
   }
 }
 
-function setupTheme() {
-  const btn = document.getElementById('themeToggle');
-  btn.addEventListener('click', () => {
-    document.body.classList.toggle('light');
-    btn.textContent = document.body.classList.contains('light') ? 'Dark Mode' : 'Light Mode';
-  });
-}
+map.on('click', e => fetchModelAtPoint(e.latlng.lat, e.latlng.lng));
 
-map.on('click', e => fetchModelData(e.latlng.lat, e.latlng.lng));
-
-setupTabs();
-setupSelectors();
-setupTheme();
-bindLayerControls();
-addRadarSites();
-updateRadarLayer();
-updateSelectedSiteCard();
+populateSelectors();
+bindOverlayControls();
+bindGlobalControls();
+addSiteMarkers();
+rebuildRadarLayer();
 renderLegend();
-syncVisibility();
-fetchWarnings();
+fetchNwsAlerts();
 fetchSpc();
-setInterval(fetchWarnings, 180000);
+setInterval(fetchNwsAlerts, 180000);
 setInterval(fetchSpc, 300000);
-map.on('click', e => fetchModelAndSounding(e.latlng.lat, e.latlng.lng));
-
-function renderLegend() {
-  const legend = document.getElementById('legendList');
-  const items = [
-    ['Regular Warning', styleState.regular],
-    ['PDS/Considerable Warning', styleState.pds],
-    ['Emergency/Destructive Warning', styleState.emergency],
-    ['Watch', styleState.watch],
-    ['Mesoscale Discussion', styleState.mcd]
-  ];
-  legend.innerHTML = items.map(([name, color]) => `<li><span class="swatch" style="background:${color}"></span>${name}</li>`).join('');
-}
-
-document.getElementById('darkModeBtn').addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-});
-
-renderLegend();
-toggleVisibility();
-fetchNwsWarnings();
-fetchSpcProducts();
-setInterval(fetchNwsWarnings, 180000);
-setInterval(fetchSpcProducts, 300000);

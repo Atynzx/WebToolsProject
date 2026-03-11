@@ -13,53 +13,17 @@
     <header class="app-header glass">
       <div>
         <h1>WeatherScope Pro</h1>
-        <p class="subtitle">Operational weather workstation: radar network, hazards, and model intelligence</p>
+        <p class="subtitle">Radar workstation · NEXRAD network · hazard intelligence</p>
       </div>
       <div class="header-actions">
-        <button id="themeToggle" class="btn">Dark Mode</button>
+        <button class="btn" id="themeToggle">Theme</button>
+        <button class="btn btn-primary" id="openSettingsBtn">Settings</button>
       </div>
     </header>
 
     <main class="workspace">
       <aside class="sidebar glass">
-        <div class="tabs" role="tablist">
-          <button class="tab-btn active" data-tab="tab-radar">Radar</button>
-          <button class="tab-btn" data-tab="tab-layers">Layers</button>
-          <button class="tab-btn" data-tab="tab-models">Models</button>
-          <button class="tab-btn" data-tab="tab-map">Map</button>
-        </div>
-
-        <section id="tab-radar" class="tab-panel active">
-          <h2>NEXRAD Network</h2>
-          <label>Radar Product
-            <select id="radarProductSelect"></select>
-          </label>
-          <label>Radar Opacity
-            <input id="radarOpacity" type="range" min="0.2" max="1" step="0.05" value="0.85" />
-          </label>
-          <p class="hint">Click a radar site on the map to load site-specific products and metadata.</p>
-          <div id="selectedSiteCard" class="card">No radar selected.</div>
-        </section>
-
-        <section id="tab-layers" class="tab-panel">
-          <h2>Hazards & Appearance</h2>
-          <label><input type="checkbox" id="toggleWarnings" checked /> Active Warnings</label>
-          <label><input type="checkbox" id="toggleWatches" checked /> SPC Watches</label>
-          <label><input type="checkbox" id="toggleMcd" checked /> Mesoscale Discussions</label>
-          <hr />
-          <label><input type="checkbox" id="toggleRegular" checked /> Regular warnings</label>
-          <label><input type="checkbox" id="togglePds" checked /> Considerable / PDS</label>
-          <label><input type="checkbox" id="toggleEmergency" checked /> Emergency / Destructive</label>
-          <div class="color-grid">
-            <label>Regular <input type="color" id="regularColor" value="#f7b500" /></label>
-            <label>PDS <input type="color" id="pdsColor" value="#ff4d4f" /></label>
-            <label>Emergency <input type="color" id="emergencyColor" value="#8f1d2c" /></label>
-            <label>Watch <input type="color" id="watchColor" value="#7c3aed" /></label>
-            <label>MCD <input type="color" id="mcdColor" value="#0ea5e9" /></label>
-          </div>
-        </section>
-
-        <section id="tab-models" class="tab-panel">
+        <section class="panel">
           <h2>Model Viewer</h2>
           <label>Model
             <select id="modelSelect"></select>
@@ -68,111 +32,68 @@
             <select id="modelFieldSelect">
               <option value="temp2m">2m Temperature</option>
               <option value="wind10m">10m Wind</option>
-              <option value="cape">CAPE (proxy)</option>
-              <option value="rh700">700mb Relative Humidity</option>
+              <option value="cape">CAPE</option>
+              <option value="rh700">700mb RH</option>
             </select>
           </label>
-          <p class="hint">Click map for point forecast sounding and model values.</p>
+          <p class="hint">Click map to sample model point data + sounding profile.</p>
           <div id="modelCard" class="card">No model query yet.</div>
           <div id="soundingCard" class="card">No sounding loaded.</div>
         </section>
 
-        <section id="tab-map" class="tab-panel">
-          <h2>Map Settings</h2>
+        <section class="panel">
+          <h2>Map Controls</h2>
           <label>Basemap
             <select id="basemapSelect"></select>
           </label>
           <label><input type="checkbox" id="toggleRadarSites" checked /> Show NEXRAD site markers</label>
-          <p class="hint">Draw tools are enabled in the top-left of the map.</p>
+          <label><input type="checkbox" id="toggleSpcWatches" checked /> Show SPC Watches</label>
+          <label><input type="checkbox" id="toggleMcd" checked /> Show MCD</label>
           <ul id="legend" class="legend"></ul>
         </section>
       </aside>
 
       <section class="map-shell glass">
         <div id="map"></div>
+
+        <div class="radar-overlay" id="radarOverlay">
+          <div class="overlay-row top-row">
+            <button class="icon-btn" id="playPauseBtn" title="Play/Pause">▶</button>
+            <button class="icon-btn" id="stepBackBtn" title="Step Back">⏪</button>
+            <button class="icon-btn" id="stepForwardBtn" title="Step Forward">⏩</button>
+            <button class="icon-btn" id="snapshotBtn" title="Snapshot">📷</button>
+            <input id="timelineSlider" type="range" min="0" max="11" value="11" />
+            <span id="timestampLabel">--/--/-- --:--</span>
+          </div>
+          <div class="divider"></div>
+          <div class="overlay-row bottom-row">
+            <label>Data Mode
+              <select id="radarDataModeSelect">
+                <option value="level3">NEXRAD Level III (Site)</option>
+                <option value="level2">NEXRAD Level II (Mosaic)</option>
+              </select>
+            </label>
+            <label>Product
+              <select id="radarProductSelect"></select>
+            </label>
+            <div class="site-meta" id="siteMeta">No site selected</div>
+          </div>
+        </div>
       </section>
-  <div class="app-shell" id="appShell">
-    <header class="topbar">
-      <div>
-        <h1>WeatherScope Pro</h1>
-        <p>Global weather intelligence: radar, MRMS, models, and hazards.</p>
-      </div>
-      <div class="topbar-actions">
-        <button id="darkModeBtn" class="button">Toggle Dark Mode</button>
-      </div>
-    </header>
-
-    <main class="main-layout">
-      <aside class="panel left-panel">
-        <section>
-          <h2>Map Controls</h2>
-          <label>Basemap
-            <select id="basemapSelect"></select>
-          </label>
-          <label>Radar Product
-            <select id="radarProductSelect"></select>
-          </label>
-          <label>Opacity
-            <input type="range" id="radarOpacity" min="0" max="1" step="0.05" value="0.75" />
-          </label>
-        </section>
-
-        <section>
-          <h2>Hazards & Discussions</h2>
-          <label><input type="checkbox" id="toggleWarnings" checked /> Live Warnings</label>
-          <label><input type="checkbox" id="toggleWatches" checked /> Watches</label>
-          <label><input type="checkbox" id="toggleMcd" checked /> Mesoscale Discussions</label>
-          <label><input type="checkbox" id="toggleWarningRegular" checked /> Regular Warning Type</label>
-          <label><input type="checkbox" id="toggleWarningPds" checked /> PDS/Considerable</label>
-          <label><input type="checkbox" id="toggleWarningEmergency" checked /> Emergency/Destructive</label>
-        </section>
-
-        <section>
-          <h2>Appearance</h2>
-          <label>Regular Warning Color
-            <input type="color" id="warningRegularColor" value="#ffbf00" />
-          </label>
-          <label>PDS/Considerable Color
-            <input type="color" id="warningPdsColor" value="#ff4500" />
-          </label>
-          <label>Emergency/Destructive Color
-            <input type="color" id="warningEmergencyColor" value="#b00020" />
-          </label>
-          <label>Watch Color
-            <input type="color" id="watchColor" value="#9c27b0" />
-          </label>
-          <label>MCD Color
-            <input type="color" id="mcdColor" value="#1976d2" />
-          </label>
-        </section>
-      </aside>
-
-      <section class="map-wrapper">
-        <div id="map"></div>
-      </section>
-
-      <aside class="panel right-panel">
-        <section>
-          <h2>Model & Soundings</h2>
-          <p>Click the map to inspect model guidance and a quick-look sounding profile.</p>
-          <div class="data-card" id="modelDataCard">Click on the map to load model data.</div>
-          <div class="data-card" id="soundingCard">No sounding loaded.</div>
-        </section>
-
-        <section>
-          <h2>Layer Legend</h2>
-          <ul class="legend" id="legendList"></ul>
-        </section>
-
-        <section>
-          <h2>Notes</h2>
-          <p class="small">
-            Data sources include RainViewer radar composites, NOAA/NWS warning feeds, and SPC mesoanalysis products.
-            Some layers are U.S.-focused because not all global hazards have open real-time APIs.
-          </p>
-        </section>
-      </aside>
     </main>
+  </div>
+
+  <div class="modal" id="settingsModal" aria-hidden="true">
+    <div class="modal-panel glass">
+      <div class="modal-header">
+        <h3>Settings</h3>
+        <button class="btn" id="closeSettingsBtn">Close</button>
+      </div>
+      <div class="settings-layout">
+        <nav class="settings-nav" id="settingsNav"></nav>
+        <section class="settings-content" id="settingsContent"></section>
+      </div>
+    </div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
