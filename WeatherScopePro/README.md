@@ -28,6 +28,25 @@ Refactored weather workstation with a map-first radar UI and structured settings
   - Watches
   - Advisories
 
+## GitHub "fix it" buttons (important)
+
+If GitHub shows warnings and offers quick-fix choices, avoid using them blindly on this project.
+Those one-click options can reformat or replace code blocks and accidentally break the app.
+
+Safer workflow:
+
+1. Pull latest changes locally.
+2. Run the app and reproduce the issue.
+3. Make a targeted edit in the affected file.
+4. Re-test locally before pushing.
+5. Open a PR so the diff can be reviewed line-by-line.
+
+If you are fixing merge conflicts specifically:
+
+- Prefer manual conflict resolution in your editor.
+- Keep both sides only when they are truly compatible.
+- Re-run checks (`node --check app.js`) and open the app after resolving.
+
 ## Run locally
 
 ```bash
