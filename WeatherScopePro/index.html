@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WeatherScope Pro</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header glass">
+      <div>
+        <h1>WeatherScope Pro</h1>
+        <p class="subtitle">Radar workstation · NEXRAD network · hazard intelligence</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn" id="themeToggle">Theme</button>
+        <button class="btn btn-primary" id="openSettingsBtn">Settings</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="sidebar glass">
+        <section class="panel">
+          <h2>Model Viewer</h2>
+          <label>Model
+            <select id="modelSelect"></select>
+          </label>
+          <label>Field
+            <select id="modelFieldSelect">
+              <option value="temp2m">2m Temperature</option>
+              <option value="wind10m">10m Wind</option>
+              <option value="cape">CAPE</option>
+              <option value="rh700">700mb RH</option>
+            </select>
+          </label>
+          <p class="hint">Click map to sample model point data + sounding profile.</p>
+          <div id="modelCard" class="card">No model query yet.</div>
+          <div id="soundingCard" class="card">No sounding loaded.</div>
+        </section>
+
+        <section class="panel">
+          <h2>Map Controls</h2>
+          <label>Basemap
+            <select id="basemapSelect"></select>
+          </label>
+          <label><input type="checkbox" id="toggleRadarSites" checked /> Show NEXRAD site markers</label>
+          <label><input type="checkbox" id="toggleSpcWatches" checked /> Show SPC Watches</label>
+          <label><input type="checkbox" id="toggleMcd" checked /> Show MCD</label>
+          <ul id="legend" class="legend"></ul>
+        </section>
+      </aside>
+
+      <section class="map-shell glass">
+        <div id="map"></div>
+
+        <div class="radar-overlay" id="radarOverlay">
+          <div class="overlay-row top-row">
+            <button class="icon-btn" id="playPauseBtn" title="Play/Pause">▶</button>
+            <button class="icon-btn" id="stepBackBtn" title="Step Back">⏪</button>
+            <button class="icon-btn" id="stepForwardBtn" title="Step Forward">⏩</button>
+            <button class="icon-btn" id="snapshotBtn" title="Snapshot">📷</button>
+            <input id="timelineSlider" type="range" min="0" max="11" value="11" />
+            <span id="timestampLabel">--/--/-- --:--</span>
+          </div>
+          <div class="divider"></div>
+          <div class="overlay-row bottom-row">
+            <label>Data Mode
+              <select id="radarDataModeSelect">
+                <option value="level3">NEXRAD Level III (Site)</option>
+                <option value="level2">NEXRAD Level II (Mosaic)</option>
+              </select>
+            </label>
+            <label>Product
+              <select id="radarProductSelect"></select>
+            </label>
+            <div class="site-meta" id="siteMeta">No site selected</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="settingsModal" aria-hidden="true">
+    <div class="modal-panel glass">
+      <div class="modal-header">
+        <h3>Settings</h3>
+        <button class="btn" id="closeSettingsBtn">Close</button>
+      </div>
+      <div class="settings-layout">
+        <nav class="settings-nav" id="settingsNav"></nav>
+        <section class="settings-content" id="settingsContent"></section>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
